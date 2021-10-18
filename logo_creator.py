@@ -3,6 +3,7 @@ from json.decoder import JSONDecodeError
 import sys
 from typing import Callable, NoReturn
 import argparse
+from PIL import Image
 magenta ="\x1b[38;5;57m"
 cat_purp = "\x1b[38;2;73;47;146m"
 
@@ -18,15 +19,12 @@ def read_file(path: str) -> str:
     with open(path, 'r') as file:
         return file.read()
 
-def parse_args():
-    parser = argparse.ArgumentParser("Creates a Matrix style effect for making logos.")
-    parser.add_argument('-c', '--config' , help="path to a json config file", default="config/default_settings.json")
-    parser.add_argument('-s', '-seed', help="this seed overrides the config file")
-    return parser.parse_args()
+
 
 def get_json(path: str) -> dict:
 
     loaded = None
+    json_file = None
 
     try:
         json_file = open(path , 'r')
@@ -39,36 +37,44 @@ def get_json(path: str) -> dict:
         print(path, "-",  e.strerror)
         
     finally:
-        json_file.close()
+        if json_file != None:
+            json_file.close()
 
     return loaded
 
 
+def parse_args(defaults: dict) -> dict:
+    parser = argparse.ArgumentParser(defaults["description"])
+    for setting in defaults["settings"]:
+        parser.add_argument(
+            *setting["flags"].split(),
+            help=setting["help"],
+            default=setting["default"]
+        )
+
+    return vars(parser.parse_args())
+
+def configure() -> dict:
+    DEFAULTS_PATH = "config/setup.json"
+    setup = get_json(DEFAULTS_PATH)
+    settings = parse_args(setup)
 
 
-def configure(args: dict) -> dict:
-    DEFAULTS_PATH = "config/default_settings.json"
-    settings = get_json(DEFAULTS_PATH)
+    if settings["config"] != DEFAULTS_PATH:
+        config = get_json(settings["config"])
 
-    if settings != None:
-        if args["config"] != DEFAULTS_PATH:
-            user_settings = get_json(args["config"])
-
-            if user_settings != None:
-                settings.update(user_settings)
-
-        settings.update(args)
+        if config != None:
+            settings.update(config)
 
     return settings
 
 def start(settings: dict) -> NoReturn:
-    pass
+    print("Settings:\n", settings)
     
 
 def main():
-    args = vars(parse_args())
 
-    settings = configure(args)
+    settings = configure()
 
     start(settings)
 
