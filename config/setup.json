@@ -41,7 +41,7 @@
         {
             "flags" : "--ascii_ramp",
             "help" : "ascii values to use light -> dark",
-            "default" : null
+            "default" : " _-.,:;*$S#@"
         },
         {
             "flags" : "--contrast",
@@ -59,13 +59,18 @@
             "default" : ".45"
         },
         {
-            "flags" : "--streak_density",
-            "help" : "density of streaks in the matrix",
-            "default" : "1"
+            "flags" : "--streak_spacing",
+            "help" : "spacing of streaks in the matrix",
+            "default" : "10"
         },
         {
             "flags" : "--streak_length",
             "help" : "length of streaks in the matrix",
+            "default" : "10"
+        },
+        {
+            "flags" : "--streak_min",
+            "help" : "smallest streak allowed must be positive and shorter than length and spacing",
             "default" : "1"
         }
     ]

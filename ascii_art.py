@@ -1,7 +1,7 @@
 from typing import Tuple
 from PIL import Image, ImageEnhance
 
-class ascii_art():
+class Ascii_art():
     def __init__(
             self,
             image_path: str, # Path the the image
@@ -12,17 +12,15 @@ class ascii_art():
             height_multiplier: float
         ):
 
-        self.ascii = ""
         self.image = Image.open(image_path)
         self.image = self.image.convert('RGB') # If the image is something other than rgb this converts it to that.
         self.set_contrast(contrast)
         self.set_brightness(brightness)
         self.ascii_ramp = ascii_ramp
         self.size = size
+        self.height_multiplier = height_multiplier
         self.c_pixels = None
         self.bw_pixels = None
-        
-        self.height_multiplier = height_multiplier
         self.generate()
 
     def set_contrast(self, new_contrast: float):
@@ -37,12 +35,13 @@ class ascii_art():
         self.c_pixels = list(self.image.getdata())
         self.image = self.image.convert('L') # Convert to black and white.
         self.bw_pixels = list(self.image.getdata())
+        self.num_pixels = len(self.bw_pixels)
 
     def __iter__(self):
-        return self
+        return self.next_ascii
     
     def __next__(self):
-        return self.pixels
+        return self.pixels()
 
    
     def image_resize(self):
@@ -61,11 +60,8 @@ class ascii_art():
             pixel = (self.bw_pixels[i], self.c_pixels[i])
             yield pixel
 
-    def ascii(self) -> str:
-        pass
-
-    def colors(self):
-        pass
+    def __len__(self):
+        return self.num_pixels
 
     def pixel_to_ascii(self, intensity: int) -> str:
         INTENSITY_MAX = 255
@@ -82,6 +78,17 @@ class ascii_art():
         r, g, b = rgb
         ansi_color += str(r) + ";" + str(g) + ";" + str(b) + "m"
         return ansi_color
+
+    def next_ascii(self, color=False) -> str:
+        for pixel in self.pixels():
+            bw , rgb, = pixel
+            pixel_str = ""
+            if color:
+                pixel_str += self.rgb_to_ansi(rgb)
+            pixel_str += self.pixel_to_ascii(bw)
+            yield pixel_str
+
+
 
 
 

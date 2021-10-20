@@ -3,7 +3,7 @@ from json.decoder import JSONDecodeError
 from typing import Callable, NoReturn
 import argparse
 
-from ascii_art import ascii_art
+from ascii_art import Ascii_art
 from matrixify import Matrixify
 
 magenta ="\x1b[38;5;57m"
@@ -80,29 +80,56 @@ def configure() -> dict:
     return settings
 
 def start(settings: dict) -> NoReturn:
-    if settings["img_path"] != None:
-        art_maker = ascii_art(
-            settings["img_path"],
-            float(settings["contrast"]),
-            float(settings["brightness"]),
-            settings["ascii_ramp"],
-            int(settings["out_res"]),
-            float(settings["height_multiplier"])
-        )
 
-        print(art_maker.__str__(color=settings["color"]))
-
-        
-    
-    '''matrix = Matrixify(
-        int(settings["out_res"]),
-        float(settings["density"]),
+    ascii_art = Ascii_art(
+        settings["img_path"],
+        float(settings["contrast"]),
+        float(settings["brightness"]),
         settings["ascii_ramp"],
-        chars,
-        colors,
+        int(settings["out_res"]),
+        float(settings["height_multiplier"])
+    )
+
+    matrix = Matrixify(
+        len(ascii_art),
+        int(settings["out_res"]),
+        int(settings["streak_spacing"]),
+        int(settings["streak_length"]),
+        int(settings["streak_min"]),
         settings["seed"]
     )
-    print(matrix.color_str())'''
+    if settings["matrix"]:
+        matrix_list = [val for val in matrix.next_in_col()]
+    else:
+        matrix_list = [True for val in matrix.next_in_col()]
+
+    ascii_matrix = combine(
+        [val for val in ascii_art.next_ascii(color=settings["color"])],
+        matrix_list
+        
+    )
+
+    
+    #print(matrix)
+    #print(ascii_art.__str__(color=settings["color"]))
+
+    i = 0
+    for val in ascii_matrix:
+        if not i % int(settings["out_res"]):
+            print()
+        print(val, sep="", end="")
+        i += 1
+
+    print()
+
+def combine(ascii: list, matrix: list) -> list:
+    
+    output = list()
+    for i in range(len(ascii)):
+        output.append(ascii[i] if matrix[i] else " ")
+    return output
+
+
     
 
     

@@ -1,6 +1,7 @@
 {
-    "seed" : "12345",
-    "color_path" : "files/colors.json",
+    "color" : true,
+    "matrix" : true,
     "text_path" : "files/logo_text.txt",
-    "img_path" :   "files/cat.jpg"
+    "img_path" :   "files/cat.jpg",
+    "ascii_ramp" : " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
 }

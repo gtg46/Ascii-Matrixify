@@ -5,3 +5,6 @@ Command line args are only used to overide default values
 using a config file is highly recomended.
 
 Example config file userConfig.json all values initialized to null
+
+To generate the catamount logo:
+    $ python3 matrix_logo.py --config config/catamount_config.json

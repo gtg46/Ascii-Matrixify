@@ -2,80 +2,70 @@ import random
 
 class Matrixify():
     def __init__(
-        self,
-        size: int,
-        density: float,
-        ascii_ramp: str = None,
-        chars: str = None,
-        colors: list = None, 
-        seed = None
-    ):
+            self,
+            size : int,
+            width: int,
+            streak_spacing: int,
+            streak_length: int,
+            streak_min: int,
+            seed = None
+        ):
 
         self.size = size
-        self.density = density
-        self.ascii_ramp = ascii_ramp
-        self.chars = chars
-        self.colors = colors
+        self.row_size = width
+        self.col_size = int(size / width)
+        self.streak_spacing = streak_spacing
+        self.streak_length = streak_length
+        self.streak_min = streak_min
         self.random = random.Random(seed)
-        
-        if self.chars != None:
-            self.matrix = self.initialize()
-        else:
-            self.matrix = self.init_random()
+        self.matrix = self.init_matrix()
 
-    def init_random(self) -> list:
-        '''Initializes a square list to random characters
+    def spacing_calc(self, last: bool) -> int:
+        if last: # if the last one was a streak
+            spacing = self.streak_spacing # this one will be a space
+        else: # if the last one was a space
+            spacing = self.streak_length # this one will be a streak
         
-        These lists are indexed column, row
-        '''
-        bound = len(self.ascii_ramp)
-        matrix = list()
-        for i in range(self.size):
-            column = list()
-            for j in range(self.size):
-                char = self.ascii_ramp[self.random.randrange(bound)]
-                column.append(char)
-            matrix.append(column)
-        return matrix
+        return random.randint(self.streak_min, spacing)
 
-    def initialize(self) -> list:
-        matrix = list()
-        
-        img_height = int(len(self.chars) / self.size)
-        for i in range(self.size):
-            column = list()
-            for j in range(img_height):
-                index = (j * self.size) + i
-                char = self.chars[index]
+    def init_matrix(self) -> list:
+        matrix = [bool(self.random.randint(0,1))]
+        n = self.spacing_calc(matrix[0])
+        for i in range(self.size - 1):
+            if n > 0:
+                matrix.append(matrix[i])
+                n -= 1
+            else:
+                n = self.spacing_calc(matrix[i])
+                matrix.append(not matrix[i])
                 
-                column.append(char)
-            matrix.append(column)
         return matrix
+            
+    def __iter__(self):
+        return self.next_in_col
+                        
+    def __next__(self, col=True):
+        if col:
+            return self.next_in_col()
+        else: 
+            return self.next_in_row()
 
-
-
-    def __str__(self):
-        img_height = int(len(self.chars) / self.size)
+    def __str__(self) -> str:
         ret_str = ""
-        for i in range(img_height):
-            for j in range(self.size):
-                ret_str += self.matrix[j][i]
+        i = 0
+        for val in self.next_in_col():
+            if not i % self.row_size:
+                ret_str += "\n"
+            ret_str += "1" if val else "0"
+            i += 1
         return ret_str
 
-    def get_matrix(self):
-        return self.matrix
+    def next_in_col(self):
+        for i in range(self.col_size):
+            for j in range(self.row_size):
+                yield self.matrix[(j * self.col_size) + i]
 
-    def get_chars(self):
-        return self.chars
-
-    def color_str(self):
-        img_height = int(len(self.chars) / self.size)
-        ret_str = ""
-        for i in range(img_height):
-            for j in range(self.size):
-                ret_str += self.get_ansi(self.colors[(i * self.size) + j])
-                ret_str += self.matrix[j][i]
-        return ret_str
-
-
+    def next_in_row(self):
+        for value in self.matrix:
+            yield value
 
