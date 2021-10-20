@@ -1,0 +1,6 @@
+{
+    "seed" : "12345",
+    "color_path" : "files/colors.json",
+    "text_path" : "files/logo_text.txt",
+    "img_path" :   "files/cat.jpg"
+}

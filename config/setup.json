@@ -1,0 +1,72 @@
+{
+    "description" : "Creates a Matrix style effect for making logos.",
+    "settings" : [
+        {
+            "flags" : "--config",
+            "help" : "path to a json config file",
+            "default" : null
+        },
+        {
+            "flags" : "-c --color",
+            "help" : "final output in color",
+            "action" : "store_true",
+            "default" : false
+        },
+        {
+            "flags" : "-m --matrix",
+            "help" : "final output in a matrix streak style",
+            "action" : "store_true",
+            "default" : false
+        },
+        {
+            "flags" : "-s --seed",
+            "help" : "seed for random object, otherwise random seed",
+            "default" : null
+        },
+        {
+          "flags" : "--img_path",
+          "help" : "image for logo, otherwise random ascii chars",
+          "default" : null
+        },
+        {
+            "flags" : "--out_res",
+            "help" : "the width of the ascii output",
+            "default" : "100"
+        },
+        {
+            "flags" : "--text_path",
+            "help" : "text to be used in the logo",
+            "default" : null
+        },
+        {
+            "flags" : "--ascii_ramp",
+            "help" : "ascii values to use light -> dark",
+            "default" : null
+        },
+        {
+            "flags" : "--contrast",
+            "help" : "specify the contrast of the ascii art",
+            "default" : "1"
+        },
+        {
+            "flags" : "--brightness",
+            "help" : "specify the brightness of the ascii art",
+            "default" : "1"
+        },
+        {
+            "flags" : "--height_multiplier",
+            "help" : "adjustment for ascii characters being rectangles",
+            "default" : ".45"
+        },
+        {
+            "flags" : "--streak_density",
+            "help" : "density of streaks in the matrix",
+            "default" : "1"
+        },
+        {
+            "flags" : "--streak_length",
+            "help" : "length of streaks in the matrix",
+            "default" : "1"
+        }
+    ]
+}

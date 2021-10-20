@@ -1,0 +1,7 @@
+This program need pillow. Get using:
+    pip install pillow
+
+Command line args are only used to overide default values
+using a config file is highly recomended.
+
+Example config file userConfig.json all values initialized to null
