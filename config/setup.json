@@ -1,5 +1,5 @@
 {
-    "description" : "Creates a Matrix style effect for making logos.",
+    "description" : "Creates a Matrix style ascii effect for making logos.",
     "settings" : [
         {
             "flags" : "--config",
@@ -19,6 +19,18 @@
             "default" : false
         },
         {
+            "flags" : "-i --invert",
+            "help" : "inverts the image",
+            "action" : "store_true",
+            "default" : false
+        },
+        {
+            "flags" : "-o --output",
+            "help" : "changes the output type",
+            "choices" : ["terminal", "image", "text"],
+            "default" : "terminal"
+        },
+        {
             "flags" : "-s --seed",
             "help" : "seed for random object, otherwise random seed",
             "default" : null
@@ -32,11 +44,6 @@
             "flags" : "--out_res",
             "help" : "the width of the ascii output",
             "default" : "100"
-        },
-        {
-            "flags" : "--text_path",
-            "help" : "text to be used in the logo",
-            "default" : null
         },
         {
             "flags" : "--ascii_ramp",
@@ -54,7 +61,7 @@
             "default" : "1"
         },
         {
-            "flags" : "--height_multiplier",
+            "flags" : "--height_adjust",
             "help" : "adjustment for ascii characters being rectangles",
             "default" : ".45"
         },

@@ -1,5 +1,10 @@
 from typing import Tuple
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
+
+'''
+Author: Grant Garcelon
+Date: October 2021
+'''
 
 class Ascii_art():
     def __init__(
@@ -9,13 +14,16 @@ class Ascii_art():
             brightness: float, # value to adjust the brightness
             ascii_ramp: str, 
             size: int,
-            height_multiplier: float
+            height_multiplier: float,
+            invert = False
         ):
 
         self.image = Image.open(image_path)
         self.image = self.image.convert('RGB') # If the image is something other than rgb this converts it to that.
         self.set_contrast(contrast)
         self.set_brightness(brightness)
+        if invert:
+            self.invert_image()
         self.ascii_ramp = ascii_ramp
         self.size = size
         self.height_multiplier = height_multiplier
@@ -29,6 +37,9 @@ class Ascii_art():
     def set_brightness(self, new_brightness: float):
         self.image = ImageEnhance.Brightness(self.image).enhance(new_brightness)
 
+    def invert_image(self):
+        self.image = ImageOps.invert(self.image)
+
 
     def generate(self):
         self.image_resize()
@@ -37,13 +48,6 @@ class Ascii_art():
         self.bw_pixels = list(self.image.getdata())
         self.num_pixels = len(self.bw_pixels)
 
-    def __iter__(self):
-        return self.next_ascii
-    
-    def __next__(self):
-        return self.pixels()
-
-   
     def image_resize(self):
         '''Resizes the image to the given size'''
         width, height = self.image.size
@@ -52,14 +56,9 @@ class Ascii_art():
         self.image = self.image.resize(new_size)
 
     def pixels(self) -> Tuple[int, Tuple[int, int, int]]:
-        assert(
-            len(self.bw_pixels) == len(self.c_pixels)
-        )
-        
-        for i in range(len(self.bw_pixels)):
-            pixel = (self.bw_pixels[i], self.c_pixels[i])
-            yield pixel
-
+        for bw, c in zip(self.bw_pixels, self.c_pixels):
+            yield (bw, c)
+          
     def __len__(self):
         return self.num_pixels
 
@@ -88,10 +87,6 @@ class Ascii_art():
             pixel_str += self.pixel_to_ascii(bw)
             yield pixel_str
 
-
-
-
-
     def __str__(self, color=False):
         ret_str = ""
         for i, pixel in enumerate(self.pixels()):
@@ -103,5 +98,23 @@ class Ascii_art():
             ret_str += self.pixel_to_ascii(bw)
             
         return ret_str
+
+def tester():
+    ascii_art = Ascii_art(
+        "files/check.jpg",
+        1.0,
+        1.0,
+        " _-.,:;*$S#@",
+        100,
+        .45
+    )
+    for val in ascii_art.next_ascii():
+        print(val, sep="", end="")
+
+
+
+
+if __name__ == '__main__':
+    tester()
 
 

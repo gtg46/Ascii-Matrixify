@@ -1,10 +1,10 @@
 {
     "text_path" : "files/logo_text.txt",
-    "img_path" :   "files/cat2.png",
+    "img_path" :   "files/cat.jpg",
     "old_ascii_ramp" : " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$",
+    "color" : true,
     "streak_length" : "20",
     "streak_spacing" : "25",
     "streak_min" : "10",
-    "out_res" : "200",
     "seed" : "WCU"
 }

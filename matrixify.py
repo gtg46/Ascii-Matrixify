@@ -1,5 +1,10 @@
 import random 
 
+'''
+Author: Grant Garcelon
+Date: October 2021
+'''
+
 class Matrixify():
     def __init__(
             self,
@@ -40,15 +45,6 @@ class Matrixify():
                 matrix.append(not matrix[i])
                 
         return matrix
-            
-    def __iter__(self):
-        return self.next_in_col
-                        
-    def __next__(self, col=True):
-        if col:
-            return self.next_in_col()
-        else: 
-            return self.next_in_row()
 
     def __str__(self) -> str:
         ret_str = ""
