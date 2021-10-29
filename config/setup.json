@@ -8,7 +8,7 @@
         },
         {
             "flags" : "-c --color",
-            "help" : "final output in color",
+            "help" : "final output in color, not compatible with text output",
             "action" : "store_true",
             "default" : false
         },
@@ -41,7 +41,22 @@
           "default" : null
         },
         {
-            "flags" : "--out_res",
+            "flags" : "--back_col",
+            "help" : "legal rgb 3-tuple background color for image output e.g. (89,44,136)",
+            "default" : "(255,255,255)"
+        },
+        {
+            "flags" : "--text_col",
+            "help" : "legal rgb 3-tuple text color when -c in not specified e.g. (89,44,136)",
+            "default" : "(0,0,0)"
+        },
+        {
+            "flags" : "--char_offset",
+            "help" : "the spacing between characters in image outputs, 2-tuple e.g. (10,10)",
+            "default" : "(10,20)"
+        },
+        {
+            "flags" : "--size",
             "help" : "the width of the ascii output",
             "default" : "100"
         },
@@ -68,17 +83,17 @@
         {
             "flags" : "--streak_spacing",
             "help" : "spacing of streaks in the matrix",
-            "default" : "10"
+            "default" : "50"
         },
         {
             "flags" : "--streak_length",
             "help" : "length of streaks in the matrix",
-            "default" : "10"
+            "default" : "20"
         },
         {
             "flags" : "--streak_min",
             "help" : "smallest streak allowed must be positive and shorter than length and spacing",
-            "default" : "1"
+            "default" : "10"
         }
     ]
 }

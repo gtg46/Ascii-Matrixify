@@ -23,9 +23,9 @@ class Matrixify():
         self.streak_length = streak_length
         self.streak_min = streak_min
         self.random = random.Random(seed)
-        self.matrix = self.init_matrix()
+        self.matrix = self._init_matrix()
 
-    def spacing_calc(self, last: bool) -> int:
+    def _spacing_calc(self, last: bool) -> int:
         if last: # if the last one was a streak
             spacing = self.streak_spacing # this one will be a space
         else: # if the last one was a space
@@ -33,15 +33,15 @@ class Matrixify():
         
         return random.randint(self.streak_min, spacing)
 
-    def init_matrix(self) -> list:
+    def _init_matrix(self) -> list:
         matrix = [bool(self.random.randint(0,1))]
-        n = self.spacing_calc(matrix[0])
+        n = self._spacing_calc(matrix[0])
         for i in range(self.size - 1):
             if n > 0:
                 matrix.append(matrix[i])
                 n -= 1
             else:
-                n = self.spacing_calc(matrix[i])
+                n = self._spacing_calc(matrix[i])
                 matrix.append(not matrix[i])
                 
         return matrix

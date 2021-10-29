@@ -20,35 +20,39 @@ class Ascii_art():
 
         self.image = Image.open(image_path)
         self.image = self.image.convert('RGB') # If the image is something other than rgb this converts it to that.
-        self.set_contrast(contrast)
-        self.set_brightness(brightness)
+        self.orig_size = self.image.size
+        self._set_contrast(contrast)
+        self._set_brightness(brightness)
         if invert:
-            self.invert_image()
+            self._invert_image()
         self.ascii_ramp = ascii_ramp
         self.size = size
         self.height_multiplier = height_multiplier
         self.c_pixels = None
         self.bw_pixels = None
-        self.generate()
+        self._generate()
 
-    def set_contrast(self, new_contrast: float):
+    def _set_contrast(self, new_contrast: float):
         self.image = ImageEnhance.Contrast(self.image).enhance(new_contrast)
 
-    def set_brightness(self, new_brightness: float):
+    def _set_brightness(self, new_brightness: float):
         self.image = ImageEnhance.Brightness(self.image).enhance(new_brightness)
 
-    def invert_image(self):
+    def _invert_image(self):
         self.image = ImageOps.invert(self.image)
 
 
-    def generate(self):
-        self.image_resize()
+    def _generate(self):
+        self._image_resize()
         self.c_pixels = list(self.image.getdata())
         self.image = self.image.convert('L') # Convert to black and white.
         self.bw_pixels = list(self.image.getdata())
         self.num_pixels = len(self.bw_pixels)
 
-    def image_resize(self):
+    def get_orig_size(self):
+        return self.orig_size
+
+    def _image_resize(self):
         '''Resizes the image to the given size'''
         width, height = self.image.size
         ratio = height / width 
@@ -58,11 +62,14 @@ class Ascii_art():
     def pixels(self) -> Tuple[int, Tuple[int, int, int]]:
         for bw, c in zip(self.bw_pixels, self.c_pixels):
             yield (bw, c)
+
+    def get_colors(self) -> list:
+        return self.c_pixels
           
     def __len__(self):
         return self.num_pixels
 
-    def pixel_to_ascii(self, intensity: int) -> str:
+    def _pixel_to_ascii(self, intensity: int) -> str:
         INTENSITY_MAX = 255
         ascii_val = ""
         if 0 <= intensity < INTENSITY_MAX:
@@ -72,7 +79,7 @@ class Ascii_art():
             ascii_val = self.ascii_ramp[-1]
         return ascii_val
 
-    def rgb_to_ansi(self, rgb: Tuple[int, int, int]) -> str:
+    def _rgb_to_ansi(self, rgb: Tuple[int, int, int]) -> str:
         ansi_color = "\x1b[38;2;"
         r, g, b = rgb
         ansi_color += str(r) + ";" + str(g) + ";" + str(b) + "m"
@@ -83,8 +90,8 @@ class Ascii_art():
             bw , rgb, = pixel
             pixel_str = ""
             if color:
-                pixel_str += self.rgb_to_ansi(rgb)
-            pixel_str += self.pixel_to_ascii(bw)
+                pixel_str += self._rgb_to_ansi(rgb)
+            pixel_str += self._pixel_to_ascii(bw)
             yield pixel_str
 
     def __str__(self, color=False):
@@ -94,8 +101,8 @@ class Ascii_art():
             if not i % self.size:
                 ret_str += "\n"
             if color:
-                ret_str += self.rgb_to_ansi(rgb)
-            ret_str += self.pixel_to_ascii(bw)
+                ret_str += self._rgb_to_ansi(rgb)
+            ret_str += self._pixel_to_ascii(bw)
             
         return ret_str
 

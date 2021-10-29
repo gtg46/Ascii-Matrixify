@@ -1,11 +1,12 @@
 import json
 from json.decoder import JSONDecodeError
-from typing import Callable, NoReturn
+from typing import Callable, NoReturn, Tuple
 import argparse
 from random import Random
 from ascii_art import Ascii_art
 from matrixify import Matrixify
 import re
+from PIL import Image, ImageDraw
 
 '''
 Author: Grant Garcelon
@@ -18,10 +19,13 @@ FLAGS = "flags"
 SETUP_PATH = "config/setup.json"
 CONFIG = "config"
 IMG_PATH = "img_path"
+BACK_COL = "back_col"
+TEXT_COL = "text_col"
+CHAR_OFFSET = "char_offset"
 CONTRAST = "contrast"
 BRIGHTNESS = "brightness"
 ASCII_RAMP = "ascii_ramp"
-OUT_RES = "out_res"
+SIZE = "size"
 HEIGHT_ASJUST = "height_adjust"
 INVERT = "invert"
 SEED = "seed"
@@ -39,6 +43,8 @@ OUTPUT = "output"
 TERMINAL = "terminal"
 IMAGE = "image"
 TEXT = "text"
+PNG = ".png"
+TXT = ".txt"
 
 ASCII_MIN = 32
 ASCII_MAX = 128
@@ -97,36 +103,73 @@ def configure() -> dict:
         config = get_json(settings[CONFIG])
 
         if config != None:
+            # Overrides command line args with config file values.
             settings.update(config)
-        else:
-            print("Using default settings")
 
     return settings
 
+def get_new_filename(extention: str) -> str:
+    prompt = "Please enter the new filename"
+    example = " e.g. \"newfile" + extention + "\""
+    cursor = " >> "
+    filename = input(prompt + cursor)
+    while not re.fullmatch("[^/\\. ]+" + extention, filename):
+        filename = input(prompt + example + cursor)
+    return filename
+
+def text_color_arr(settings:dict, size: int) -> list:
+    color_list = list()
+    for i in range(size):
+        color_list.append(eval(settings[TEXT_COL]))
+    return color_list
+
+def get_xy(length: int, size: int, char_size: Tuple[int, int]) -> Tuple[int, int]:
+    X = 0
+    Y = 1
+    j = -1 
+    for i in range(length):
+        x = i % size
+        if not x:
+            j += 1
+        yield (x * char_size[X], j * char_size[Y])
+
+def get_out_size(length: int, size: int, char_size: Tuple[int, int]) -> Tuple[int, int]:
+    X = 0
+    Y = 1
+    vert_size = int(length / size)
+    return (size * char_size[X], vert_size * char_size[Y])
+
+
 def start(settings: dict) -> NoReturn:
+    
     if settings[IMG_PATH] != None: # ascii art object
         ascii_art = Ascii_art(
             settings[IMG_PATH],
             float(settings[CONTRAST]),
             float(settings[BRIGHTNESS]),
             settings[ASCII_RAMP],
-            int(settings[OUT_RES]),
+            int(settings[SIZE]),
             float(settings[HEIGHT_ASJUST]),
             settings[INVERT]
         )
-        ascii_list = [val for val in ascii_art.next_ascii(settings[COLOR])]
+        size = ascii_art.get_orig_size()
+        color = settings[COLOR] and settings[OUTPUT] == TERMINAL
+        ascii_list = [val for val in ascii_art.next_ascii(color)]
+        color = ascii_art.get_colors() if settings[COLOR] else text_color_arr(settings, len(ascii_list))
 
     else: # Generates an array of random ascii characters
-        size = int(settings[OUT_RES]) * int(settings[OUT_RES])
+        size = int(settings[SIZE]) * int(settings[SIZE])
         r = Random(settings[SEED])
         ascii_list = list()
         for i in range(size):
             ascii_list.append(chr(r.randrange(ASCII_MIN, ASCII_MAX)))
+        color = text_color_arr(settings, len(ascii_list))
+            
 
     if settings[MATRIX]:
         matrix = Matrixify(
             len(ascii_list),
-            int(settings[OUT_RES]),
+            int(settings[SIZE]),
             int(settings[STREAK_SPACING]),
             int(settings[STREAK_LENGTH]),
             int(settings[STREAK_MIN]),
@@ -137,32 +180,39 @@ def start(settings: dict) -> NoReturn:
     else:
         ascii_out = ascii_list
 
+    folder = "files/"
     if settings[OUTPUT] == TERMINAL:
-        print(list_to_str(ascii_out, int(settings[OUT_RES])))
+        print(list_to_str(ascii_out, int(settings[SIZE])))
+
     elif settings[OUTPUT] == IMAGE:
-        pass # not implemented
+        out_img = Image.new('RGB', get_out_size(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), eval(settings[BACK_COL]))
+        drawer = ImageDraw.Draw(out_img)
+        for xy, char, fill in zip(get_xy(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), ascii_out, color):
+            drawer.text(xy, char, fill)
+        
+        path = folder + get_new_filename(PNG)
+        out_img.save(path)
+        print("File \"" + path + "\"created")
+
     elif settings[OUTPUT] == TEXT:
-        prompt = "Please enter the new filename"
-        example = " e.g. \"new_out_file.txt\""
-        cursor = " >> "
-        folder = "files/"
-        filename = input(prompt + cursor)
-        while not re.fullmatch("[^/\\. ]+.txt", filename):
-            filename = input(prompt + example + cursor)
+        path = folder + get_new_filename(TXT)
         try:
-            file = open(folder + filename, WRITE)
+            file = open(path, WRITE)
+            print("File \"" + path + "\"created")
         except Exception as e:
             print("File Error")
             print(e)
         if file != None:
-            file.write(list_to_str(ascii_out, int(settings[OUT_RES])))
+            file.write(list_to_str(ascii_out, int(settings[SIZE])))
             file.close()
+
     else:
         print("Inavlid output type")
 
 
 def main():
     settings = configure()
+    print("Configured, generating...")
     start(settings)
 
 if __name__ == '__main__':
