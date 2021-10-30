@@ -10,5 +10,8 @@
     "streak_spacing" : "10",
     "invert" : true,
     "height_adjust" : ".6",
-    "transparent" : true
+    "title_text" : "\"Computer Science \\n\n           @ WCU\"",
+    "title_pos" : "(0,330)",
+    "title_font" : "files/digital-7.ttf",
+    "title_size" : "65"
 }

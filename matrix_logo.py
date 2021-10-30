@@ -205,7 +205,10 @@ def start(settings: dict) -> NoReturn:
         print(list_to_str(ascii_out, int(settings[SIZE])))
 
     elif settings[OUTPUT] == IMAGE:
-        out_img = Image.new('RGB', get_out_size(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), eval(settings[BACK_COL]))
+        if settings[TRANSPARENT]:
+            out_img = Image.new('RGBA', get_out_size(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), (0,0,0,0))
+        else:
+            out_img = Image.new('RGB', get_out_size(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), eval(settings[BACK_COL]))
         drawer = ImageDraw.Draw(out_img)
 
         for xy, char, fill in zip(get_xy(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), ascii_out, color):
