@@ -23,8 +23,7 @@ class Ascii_art():
         self.orig_size = self.image.size
         self._set_contrast(contrast)
         self._set_brightness(brightness)
-        if invert:
-            self._invert_image()
+        self.invert = invert
         self.ascii_ramp = ascii_ramp
         self.size = size
         self.height_multiplier = height_multiplier
@@ -46,6 +45,8 @@ class Ascii_art():
         self._image_resize()
         self.c_pixels = list(self.image.getdata())
         self.image = self.image.convert('L') # Convert to black and white.
+        if self.invert:
+            self._invert_image()
         self.bw_pixels = list(self.image.getdata())
         self.num_pixels = len(self.bw_pixels)
 

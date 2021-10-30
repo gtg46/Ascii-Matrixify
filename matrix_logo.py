@@ -6,7 +6,7 @@ from random import Random
 from ascii_art import Ascii_art
 from matrixify import Matrixify
 import re
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 '''
 Author: Grant Garcelon
@@ -16,11 +16,17 @@ Date: October 2021
 DESCRIPTION = "description"
 SETTINGS = "settings"
 FLAGS = "flags"
-SETUP_PATH = "config/setup.json"
+SETUP_PATH = "configs/setup.json"
 CONFIG = "config"
 IMG_PATH = "img_path"
 BACK_COL = "back_col"
 TEXT_COL = "text_col"
+TITLE_COL = "title_col"
+TITLE_POS = "title_pos"
+TITLE_TEXT = "title_text"
+TITLE_SIZE = "title_size"
+TITLE_FONT = "title_font"
+TEXT_FONT = "text_font"
 CHAR_OFFSET = "char_offset"
 CONTRAST = "contrast"
 BRIGHTNESS = "brightness"
@@ -34,6 +40,13 @@ STREAK_LENGTH = "streak_length"
 STREAK_MIN = "streak_min"
 MATRIX = "matrix"
 COLOR = "color"
+TRANSPARENT = "transparent"
+MATRIX_DIR = "matrix_dir"
+HORIZONTAL = "horizontal"
+VERTICAL = "vertical"
+FILENAME = "filename"
+OUTPUT_FOLDER = "output_folder"
+
 SPACE = " "
 EMPTY = ""
 READ = "r"
@@ -113,9 +126,12 @@ def get_new_filename(extention: str) -> str:
     example = " e.g. \"newfile" + extention + "\""
     cursor = " >> "
     filename = input(prompt + cursor)
-    while not re.fullmatch("[^/\\. ]+" + extention, filename):
+    while not check_filename(filename, extention):
         filename = input(prompt + example + cursor)
     return filename
+
+def check_filename(filename: str, extention: str) -> bool:
+    return re.fullmatch("[^/\\. ]+" + extention, filename)
 
 def text_color_arr(settings:dict, size: int) -> list:
     color_list = list()
@@ -175,27 +191,51 @@ def start(settings: dict) -> NoReturn:
             int(settings[STREAK_MIN]),
             settings[SEED]
         )
-        
-        ascii_out = [ascii_val if matrix_val else SPACE for ascii_val, matrix_val in zip(ascii_list , matrix.next_in_col())]
+        if settings[MATRIX_DIR] == VERTICAL:
+            ascii_out = [ascii_val if matrix_val else SPACE for ascii_val, matrix_val in zip(ascii_list , matrix.next_in_col())]
+        elif settings[MATRIX_DIR] == HORIZONTAL:
+            ascii_out = [ascii_val if matrix_val else SPACE for ascii_val, matrix_val in zip(ascii_list , matrix.next_in_row())]
+        else:
+            raise Exception("unknown matrix direction") 
     else:
         ascii_out = ascii_list
 
-    folder = "files/"
+    folder = settings[OUTPUT_FOLDER]
     if settings[OUTPUT] == TERMINAL:
         print(list_to_str(ascii_out, int(settings[SIZE])))
 
     elif settings[OUTPUT] == IMAGE:
         out_img = Image.new('RGB', get_out_size(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), eval(settings[BACK_COL]))
         drawer = ImageDraw.Draw(out_img)
+
         for xy, char, fill in zip(get_xy(len(ascii_out), int(settings[SIZE]), eval(settings[CHAR_OFFSET])), ascii_out, color):
             drawer.text(xy, char, fill)
+
+        if settings[TITLE_TEXT] != None:
+            if settings[TITLE_FONT] != None:
+                title_font = ImageFont.truetype(settings[TITLE_FONT], size=int(settings[TITLE_SIZE]))
+            else:
+                title_font = ImageFont.load_default()           
+            drawer.multiline_text(
+                eval(settings[TITLE_POS]),
+                settings[TITLE_TEXT],
+                fill=eval(settings[TITLE_COL]),
+                font=title_font
+            )
         
-        path = folder + get_new_filename(PNG)
+        if settings[FILENAME] != None and check_filename(settings[FILENAME], PNG):
+            path = folder + settings[FILENAME]
+        else:
+            path = folder + get_new_filename(PNG)
         out_img.save(path)
         print("File \"" + path + "\"created")
 
     elif settings[OUTPUT] == TEXT:
-        path = folder + get_new_filename(TXT)
+        if settings[FILENAME] != None and check_filename(settings[FILENAME], TXT):
+            path = folder + settings[FILENAME]
+        else:
+            path = folder + get_new_filename(TXT)
+
         try:
             file = open(path, WRITE)
             print("File \"" + path + "\"created")
@@ -214,6 +254,7 @@ def main():
     settings = configure()
     print("Configured, generating...")
     start(settings)
+    print("Done.")
 
 if __name__ == '__main__':
     main()

@@ -20,7 +20,13 @@
         },
         {
             "flags" : "-i --invert",
-            "help" : "inverts the image",
+            "help" : "inverts the image brightness",
+            "action" : "store_true",
+            "default" : false
+        },
+        {
+            "flags" : "-t --transparent",
+            "help" : "transparent background for image outputs",
             "action" : "store_true",
             "default" : false
         },
@@ -41,19 +47,60 @@
           "default" : null
         },
         {
+            "flags" : "--matrix_dir",
+            "help" : "the direction of the matrix effect",
+            "choices" : ["vertical", "horizontal"],
+            "default" : "vertical"
+        },
+        {
+            "flags" : "--filename",
+            "help" : "the name of the output file",
+            "default" : null
+        },
+        {
+            "flags" : "--output_folder",
+            "help" : "the output location for image and text output e.g. \"files/\"",
+            "default" : "files/"
+        },
+        {   
+            "flags" : "--title_font",
+            "help" : "the title font for image outputs",
+            "default" : null
+        },
+        {
             "flags" : "--back_col",
             "help" : "legal rgb 3-tuple background color for image output e.g. (89,44,136)",
-            "default" : "(255,255,255)"
+            "default" : "(30,30,30)"
         },
         {
             "flags" : "--text_col",
             "help" : "legal rgb 3-tuple text color when -c in not specified e.g. (89,44,136)",
-            "default" : "(0,0,0)"
+            "default" : "(255,255,255)"
+        },
+        {
+            "flags" : "--title_col",
+            "help" : "legal rgb 3-tuple title color, only works with image output e.g. (89,44,136)",
+            "default" : "(255,255,255)"
+        },
+        {   
+            "flags" : "--title_pos",
+            "help" : "the x,y position of titles for image outputs, 2-tuple e.g. (10,10)",
+            "default" : "(10,10)"
+        },
+        {
+            "flags" : "--title_text",
+            "help" : "The text that is displayed as the title",
+            "default" : null
+        },
+        {
+            "flags" : "--title_size",
+            "help" : "the size of the text strokes for the title",
+            "default" : "6"
         },
         {
             "flags" : "--char_offset",
-            "help" : "the spacing between characters in image outputs, 2-tuple e.g. (10,10)",
-            "default" : "(10,20)"
+            "help" : "the x,y spacing between characters in image outputs, 2-tuple e.g. (10,10)",
+            "default" : "(6,10)"
         },
         {
             "flags" : "--size",

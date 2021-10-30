@@ -1,0 +1,19 @@
+{
+    "img_path" : "files/Cat.jpg",
+    "output" : "image",
+    "back_col" : "(30,30,30)",
+    "text_col" : "(0,250,0)",
+    "size" : "90",
+    "filename" : "matrix_cat.png",
+    "matrix" : true,
+    "streak_length" : "30",
+    "streak_spacing" : "10",
+    "invert" : true,
+    "height_adjust" : ".6",
+    "title_text" : "\"Computer Science @ WCU\"",
+    "title_pos" : "(0,285)",
+    "title_font" : "files/09809_COURIER.ttf",
+    "title_size" : "38"
+
+    
+}
